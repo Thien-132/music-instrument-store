@@ -1,7 +1,9 @@
-
 "use client";
-import { useCart } from "../../context/CartContext";
-import { use } from "react";
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useCart } from "@/app/context/CartContext";
 
 const products = [
   {
@@ -9,159 +11,752 @@ const products = [
     name: "Yamaha YAS-280",
     price: "35.800.000đ",
     image: "/images/yamaha-yas280.jpg",
-    description:
-      "Yamaha YAS-280 là mẫu Saxophone Alto nổi tiếng dành cho người mới học và người chơi bán chuyên. Âm thanh sáng, dễ thổi và độ bền cao.",
+    gallery: [
+      "/images/yamaha-yas280.jpg",
+      "/images/yamaha-yas280-1.jpg",
+      "/images/yamaha-yas280-2.jpg",
+      "/images/yamaha-yas280-3.jpg",
+    ],
     brand: "Yamaha",
     type: "Alto Saxophone",
+    origin: "Nhật Bản",
+    warranty: "24 tháng",
+    status: "Còn hàng",
+    description:
+      "Yamaha YAS-280 là dòng Alto Saxophone phù hợp cho người mới học và học sinh âm nhạc. Kèn có âm thanh sáng, dễ thổi, phím bấm nhẹ và độ ổn định cao.",
+    features: [
+      "Phù hợp cho người mới bắt đầu",
+      "Âm thanh sáng, dễ kiểm soát",
+      "Phím bấm nhẹ, dễ thao tác",
+      "Thiết kế bền bỉ cho luyện tập hằng ngày",
+    ],
+    specs: {
+      "Thương hiệu": "Yamaha",
+      "Loại kèn": "Alto Saxophone",
+      "Xuất xứ": "Nhật Bản",
+      "Bảo hành": "24 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người mới học, học sinh âm nhạc",
+    },
   },
   {
     id: 2,
     name: "Selmer AS500",
     price: "51.000.000đ",
     image: "/images/selmer-as500.jpg",
-    description:
-      "Selmer AS500 mang đến âm thanh cân bằng, thiết kế sang trọng và cảm giác bấm phím thoải mái.",
+    gallery: [
+      "/images/selmer-as500.jpg",
+      "/images/selmer-as500-1.jpg",
+      "/images/selmer-as500-2.jpg",
+      "/images/selmer-as500-3.jpg",
+    ],
     brand: "Selmer",
     type: "Alto Saxophone",
+    origin: "Mỹ / Pháp",
+    warranty: "24 tháng",
+    status: "Còn hàng",
+    description:
+      "Selmer AS500 là mẫu Alto Saxophone có thiết kế chắc chắn, âm thanh ấm và dễ kiểm soát. Sản phẩm phù hợp cho người học nghiêm túc và người chơi bán chuyên.",
+    features: [
+      "Âm thanh ấm, ổn định",
+      "Thiết kế chắc chắn",
+      "Phù hợp luyện tập và biểu diễn cơ bản",
+      "Dễ bảo dưỡng, dễ sử dụng",
+    ],
+    specs: {
+      "Thương hiệu": "Selmer",
+      "Loại kèn": "Alto Saxophone",
+      "Xuất xứ": "Mỹ / Pháp",
+      "Bảo hành": "24 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người học nghiêm túc, bán chuyên",
+    },
   },
   {
     id: 3,
     name: "Conn Director",
     price: "12.000.000đ",
     image: "/images/conn-as650.jpg",
-    description:
-      "Conn Director là dòng saxophone cổ điển với âm sắc ấm áp, phù hợp nhạc Jazz và hòa tấu.",
+    gallery: [
+      "/images/conn-as650.jpg",
+      "/images/conn-as650-1.jpg",
+      "/images/conn-as650-2.jpg",
+      "/images/conn-as650-3.jpg",
+    ],
     brand: "Conn",
     type: "Alto Saxophone",
+    origin: "Mỹ",
+    warranty: "12 tháng",
+    status: "Còn hàng",
+    description:
+      "Conn Director là dòng saxophone phổ thông có mức giá dễ tiếp cận. Kèn phù hợp cho người mới bắt đầu, học sinh hoặc người cần một cây kèn để luyện tập hằng ngày.",
+    features: [
+      "Giá dễ tiếp cận",
+      "Phù hợp người mới bắt đầu",
+      "Âm thanh ổn định",
+      "Dễ dùng cho luyện tập hằng ngày",
+    ],
+    specs: {
+      "Thương hiệu": "Conn",
+      "Loại kèn": "Alto Saxophone",
+      "Xuất xứ": "Mỹ",
+      "Bảo hành": "12 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người mới học, học sinh",
+    },
   },
   {
     id: 4,
     name: "Yamaha YTS-280",
     price: "42.000.000đ",
     image: "/images/yamaha-yts280.jpg",
-    description:
-      "Yamaha YTS-280 là mẫu Tenor Saxophone chất lượng cao với âm thanh mạnh mẽ và dễ kiểm soát.",
+    gallery: [
+      "/images/yamaha-yts280.jpg",
+      "/images/yamaha-yts280-1.jpg",
+      "/images/yamaha-yts280-2.jpg",
+      "/images/yamaha-yts280-3.jpg",
+    ],
     brand: "Yamaha",
     type: "Tenor Saxophone",
+    origin: "Nhật Bản",
+    warranty: "24 tháng",
+    status: "Còn hàng",
+    description:
+      "Yamaha YTS-280 là mẫu Tenor Saxophone có âm thanh dày, vang và ổn định. Đây là lựa chọn tốt cho người học tenor saxophone từ cơ bản đến trung cấp.",
+    features: [
+      "Âm thanh dày và vang",
+      "Thân kèn chắc chắn",
+      "Phù hợp luyện tập tenor saxophone",
+      "Độ ổn định cao",
+    ],
+    specs: {
+      "Thương hiệu": "Yamaha",
+      "Loại kèn": "Tenor Saxophone",
+      "Xuất xứ": "Nhật Bản",
+      "Bảo hành": "24 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người học cơ bản đến trung cấp",
+    },
   },
   {
     id: 5,
     name: "Selmer Supreme",
     price: "95.000.000đ",
     image: "/images/selmer-supreme.jpg",
-    description:
-      "Selmer Supreme là dòng kèn cao cấp dành cho nghệ sĩ chuyên nghiệp với chất âm xuất sắc.",
+    gallery: [
+      "/images/selmer-supreme.jpg",
+      "/images/selmer-supreme-1.jpg",
+      "/images/selmer-supreme-2.jpg",
+      "/images/selmer-supreme-3.jpg",
+    ],
     brand: "Selmer",
     type: "Professional Saxophone",
+    origin: "Pháp",
+    warranty: "24 tháng",
+    status: "Còn hàng",
+    description:
+      "Selmer Supreme là dòng saxophone chuyên nghiệp cao cấp, nổi bật với độ hoàn thiện tinh xảo, âm thanh mạnh mẽ, giàu cảm xúc và khả năng biểu diễn linh hoạt.",
+    features: [
+      "Dòng kèn chuyên nghiệp cao cấp",
+      "Âm thanh mạnh mẽ, giàu cảm xúc",
+      "Độ hoàn thiện tinh xảo",
+      "Phù hợp biểu diễn chuyên nghiệp",
+    ],
+    specs: {
+      "Thương hiệu": "Selmer",
+      "Loại kèn": "Professional Saxophone",
+      "Xuất xứ": "Pháp",
+      "Bảo hành": "24 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người chơi chuyên nghiệp",
+    },
   },
   {
     id: 6,
     name: "Conn New Wonder",
     price: "28.000.000đ",
     image: "/images/conn-newwoner.jpg",
-    description:
-      "Conn New Wonder là mẫu saxophone cổ điển nổi tiếng từ những năm 1920.",
+    gallery: [
+      "/images/conn-newwoner.jpg",
+      "/images/conn-newwoner-1.jpg",
+      "/images/conn-newwoner-2.jpg",
+      "/images/conn-newwoner-3.jpg",
+    ],
     brand: "Conn",
     type: "Vintage Saxophone",
+    origin: "Mỹ",
+    warranty: "12 tháng",
+    status: "Còn hàng",
+    description:
+      "Conn New Wonder là mẫu saxophone cổ điển nổi tiếng, mang chất âm vintage ấm áp và có giá trị sưu tầm. Phù hợp với người yêu phong cách saxophone cổ.",
+    features: [
+      "Phong cách vintage cổ điển",
+      "Chất âm ấm áp",
+      "Có giá trị sưu tầm",
+      "Phù hợp người yêu saxophone cổ",
+    ],
+    specs: {
+      "Thương hiệu": "Conn",
+      "Loại kèn": "Vintage Saxophone",
+      "Xuất xứ": "Mỹ",
+      "Bảo hành": "12 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người chơi yêu phong cách cổ điển",
+    },
   },
+  {
+    id: 7,
+    name: "Yanagisawa A-WO1",
+    price: "72.000.000đ",
+    image: "/images/yanagisawa-awo1.jpg",
+    gallery: [
+      "/images/yanagisawa-awo1.jpg",
+      "/images/yanagisawa-awo1-1.jpg",
+      "/images/yanagisawa-awo1-2.jpg",
+      "/images/yanagisawa-awo1-3.jpg",
+    ],
+    brand: "Yanagisawa",
+    type: "Alto Saxophone",
+    origin: "Nhật Bản",
+    warranty: "24 tháng",
+    status: "Còn hàng",
+    description:
+      "Yanagisawa A-WO1 là dòng Alto Saxophone cao cấp, phím bấm mượt, âm thanh cân bằng và độ phản hồi tốt. Phù hợp cho người chơi bán chuyên và chuyên nghiệp.",
+    features: [
+      "Phím bấm mượt, phản hồi nhanh",
+      "Âm thanh cân bằng",
+      "Thiết kế cao cấp",
+      "Phù hợp bán chuyên và chuyên nghiệp",
+    ],
+    specs: {
+      "Thương hiệu": "Yanagisawa",
+      "Loại kèn": "Alto Saxophone",
+      "Xuất xứ": "Nhật Bản",
+      "Bảo hành": "24 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Bán chuyên, chuyên nghiệp",
+    },
+  },
+  {
+    id: 8,
+    name: "Jupiter JAS700",
+    price: "24.500.000đ",
+    image: "/images/jupiter-jas700.jpg",
+    gallery: [
+      "/images/jupiter-jas700.jpg",
+      "/images/jupiter-jas700-1.jpg",
+      "/images/jupiter-jas700-2.jpg",
+      "/images/jupiter-jas700-3.jpg",
+    ],
+    brand: "Jupiter",
+    type: "Student Saxophone",
+    origin: "Đài Loan",
+    warranty: "18 tháng",
+    status: "Còn hàng",
+    description:
+      "Jupiter JAS700 là mẫu saxophone dành cho học sinh, dễ chơi, dễ bảo dưỡng và có mức giá hợp lý. Đây là lựa chọn tốt cho người mới bắt đầu học saxophone.",
+    features: [
+      "Dành cho học sinh và người mới học",
+      "Dễ chơi, dễ bảo dưỡng",
+      "Giá hợp lý",
+      "Âm thanh ổn định",
+    ],
+    specs: {
+      "Thương hiệu": "Jupiter",
+      "Loại kèn": "Student Saxophone",
+      "Xuất xứ": "Đài Loan",
+      "Bảo hành": "18 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Học sinh, người mới bắt đầu",
+    },
+  },
+  {
+    id: 9,
+    name: "Yamaha YSS-475",
+    price: "72.000.000đ",
+    image: "/images/yamaha-yss475.jpg",
+    gallery: [
+      "/images/yamaha-yss475.jpg",
+    ],
+    brand: "Yamaha",
+    type: "Soprano Saxophone",
+    origin: "Nhật Bản",
+    warranty: "24 tháng",
+    status: "Còn hàng",
+    description:
+      "Yamaha YSS-475 là mẫu Soprano Saxophone cao cấp, âm thanh sáng, phím bấm nhẹ và độ ổn định cao. Phù hợp cho người học nâng cao và biểu diễn.",
+    features: [
+      "Âm thanh sáng, rõ",
+      "Phím bấm nhẹ, dễ kiểm soát",
+      "Thiết kế nhỏ gọn, sang trọng",
+      "Phù hợp luyện tập và biểu diễn",
+    ],
+    specs: {
+      "Thương hiệu": "Yamaha",
+      "Loại kèn": "Soprano Saxophone",
+      "Xuất xứ": "Nhật Bản",
+      "Bảo hành": "24 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người học nâng cao, biểu diễn",
+    },
+  },
+  {
+    id: 10,
+    name: "Yanagisawa S901",
+    price: "68.000.000đ",
+    image: "/images/yanagisawa-s901.jpg",
+    gallery: [
+      "/images/yanagisawa-s901.jpg",
+    ],
+    brand: "Yanagisawa",
+    type: "Soprano Saxophone",
+    origin: "Nhật Bản",
+    warranty: "24 tháng",
+    status: "Còn hàng",
+    description:
+      "Yanagisawa S901 là dòng Soprano Saxophone chất lượng cao, nổi bật với âm thanh cân bằng, độ hoàn thiện tốt và cảm giác chơi mượt mà.",
+    features: [
+      "Âm thanh cân bằng",
+      "Phím bấm mượt",
+      "Độ hoàn thiện cao",
+      "Phù hợp bán chuyên và chuyên nghiệp",
+    ],
+    specs: {
+      "Thương hiệu": "Yanagisawa",
+      "Loại kèn": "Soprano Saxophone",
+      "Xuất xứ": "Nhật Bản",
+      "Bảo hành": "24 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Bán chuyên, chuyên nghiệp",
+    },
+  },
+  {
+    id: 11,
+    name: "Jupiter JSS-1000",
+    price: "45.000.000đ",
+    image: "/images/jupiter-jss1000.jpg",
+    gallery: [
+      "/images/jupiter-jss1000.jpg",
+    ],
+    brand: "Jupiter",
+    type: "Soprano Saxophone",
+    origin: "Đài Loan",
+    warranty: "18 tháng",
+    status: "Còn hàng",
+    description:
+      "Jupiter JSS-1000 là mẫu Soprano Saxophone có mức giá hợp lý, âm thanh ổn định, phù hợp cho người mới học và người chơi bán chuyên.",
+    features: [
+      "Giá hợp lý",
+      "Âm thanh ổn định",
+      "Dễ chơi, dễ bảo dưỡng",
+      "Phù hợp người mới học",
+    ],
+    specs: {
+      "Thương hiệu": "Jupiter",
+      "Loại kèn": "Soprano Saxophone",
+      "Xuất xứ": "Đài Loan",
+      "Bảo hành": "18 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người mới học, bán chuyên",
+    },
+  },
+  {
+    id: 12,
+    name: "Yamaha 4C Mouthpiece",
+    price: "950.000đ",
+    image: "/images/yamaha-4c-mouthpiece.jpg",
+    gallery: [
+      "/images/yamaha-4c-mouthpiece.jpg",
+    ],
+    brand: "Yamaha",
+    type: "Mouthpiece",
+    origin: "Nhật Bản",
+    warranty: "12 tháng",
+    status: "Còn hàng",
+    description:
+      "Yamaha 4C Mouthpiece là miệng thổi saxophone phổ biến, dễ thổi, phù hợp cho người mới học và luyện tập hằng ngày.",
+    features: [
+      "Dễ thổi, dễ kiểm soát hơi",
+      "Phù hợp cho người mới học",
+      "Âm thanh ổn định",
+      "Thiết kế bền, dễ sử dụng",
+    ],
+    specs: {
+      "Thương hiệu": "Yamaha",
+      "Loại sản phẩm": "Mouthpiece",
+      "Xuất xứ": "Nhật Bản",
+      "Bảo hành": "12 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người mới học, luyện tập",
+    },
+  },
+  {
+    id: 13,
+    name: "Selmer S80 C* Mouthpiece",
+    price: "4.200.000đ",
+    image: "/images/selmer-s80-mouthpiece.jpg",
+    gallery: [
+      "/images/selmer-s80-mouthpiece.jpg",
+    ],
+    brand: "Selmer",
+    type: "Mouthpiece",
+    origin: "Pháp",
+    warranty: "12 tháng",
+    status: "Còn hàng",
+    description:
+      "Selmer S80 C* Mouthpiece có âm thanh ấm, độ phản hồi tốt, phù hợp cho học tập nghiêm túc và biểu diễn.",
+    features: [
+      "Âm thanh ấm và rõ",
+      "Độ phản hồi tốt",
+      "Phù hợp học tập và biểu diễn",
+      "Thiết kế cao cấp",
+    ],
+    specs: {
+      "Thương hiệu": "Selmer",
+      "Loại sản phẩm": "Mouthpiece",
+      "Xuất xứ": "Pháp",
+      "Bảo hành": "12 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người học nghiêm túc, biểu diễn",
+    },
+  },
+  {
+    id: 14,
+    name: "Vandoren AL3 Mouthpiece",
+    price: "3.600.000đ",
+    image: "/images/vandoren-al3-mouthpiece.jpg",
+    gallery: [
+      "/images/vandoren-al3-mouthpiece.jpg",
+    ],
+    brand: "Vandoren",
+    type: "Mouthpiece",
+    origin: "Pháp",
+    warranty: "12 tháng",
+    status: "Còn hàng",
+    description:
+      "Vandoren AL3 Mouthpiece cho âm thanh cân bằng, dễ kiểm soát, phù hợp với người chơi alto saxophone từ cơ bản đến nâng cao.",
+    features: [
+      "Âm thanh cân bằng",
+      "Dễ kiểm soát âm sắc",
+      "Phù hợp luyện tập và biểu diễn",
+      "Chất lượng hoàn thiện tốt",
+    ],
+    specs: {
+      "Thương hiệu": "Vandoren",
+      "Loại sản phẩm": "Mouthpiece",
+      "Xuất xứ": "Pháp",
+      "Bảo hành": "12 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người học cơ bản đến nâng cao",
+    },
+  },
+  {
+    id: 15,
+    name: "Dây Đeo Saxophone",
+    price: "350.000đ",
+    image: "/images/day-deo-saxophone.jpg",
+    gallery: [
+      "/images/day-deo-saxophone.jpg",
+    ],
+    brand: "Yamaha",
+    type: "Phụ Kiện",
+    origin: "Việt Nam",
+    warranty: "6 tháng",
+    status: "Còn hàng",
+    description:
+      "Dây đeo Saxophone giúp người chơi đỡ mỏi cổ và giữ kèn chắc chắn khi luyện tập hoặc biểu diễn.",
+    features: [
+      "Thiết kế chắc chắn",
+      "Đeo thoải mái khi chơi lâu",
+      "Dễ điều chỉnh độ dài",
+      "Phù hợp nhiều loại saxophone",
+    ],
+    specs: {
+      "Thương hiệu": "Yamaha",
+      "Loại sản phẩm": "Dây đeo Saxophone",
+      "Xuất xứ": "Việt Nam",
+      "Bảo hành": "6 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người học và người biểu diễn",
+    },
+  },
+  {
+    id: 16,
+    name: "Kèn Reed Alto Saxophone",
+    price: "650.000đ",
+    image: "/images/reed-alto-saxophone.jpg",
+    gallery: [
+      "/images/reed-alto-saxophone.jpg",
+    ],
+    brand: "Vandoren",
+    type: "Phụ Kiện",
+    origin: "Pháp",
+    warranty: "Không bảo hành",
+    status: "Còn hàng",
+    description:
+      "Reed Alto Saxophone hỗ trợ tạo âm thanh ổn định, dễ phát âm và phù hợp cho luyện tập hằng ngày.",
+    features: [
+      "Âm thanh ổn định",
+      "Dễ phát âm",
+      "Phù hợp Alto Saxophone",
+      "Thích hợp cho luyện tập và biểu diễn",
+    ],
+    specs: {
+      "Thương hiệu": "Vandoren",
+      "Loại sản phẩm": "Reed Alto Saxophone",
+      "Xuất xứ": "Pháp",
+      "Bảo hành": "Không bảo hành",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người chơi Alto Saxophone",
+    },
+  },
+  {
+    id: 17,
+    name: "Bộ Vệ Sinh Saxophone",
+    price: "480.000đ",
+    image: "/images/bo-ve-sinh-saxophone.jpg",
+    gallery: [
+      "/images/bo-ve-sinh-saxophone.jpg",
+    ],
+    brand: "Yamaha",
+    type: "Phụ Kiện",
+    origin: "Trung Quốc",
+    warranty: "6 tháng",
+    status: "Còn hàng",
+    description:
+      "Bộ vệ sinh Saxophone giúp làm sạch thân kèn, phím kèn và bên trong ống kèn sau khi sử dụng.",
+    features: [
+      "Hỗ trợ vệ sinh kèn sau khi chơi",
+      "Giúp bảo quản kèn tốt hơn",
+      "Gồm khăn lau, chổi vệ sinh và phụ kiện hỗ trợ",
+      "Dễ sử dụng cho người mới học",
+    ],
+    specs: {
+      "Thương hiệu": "Yamaha",
+      "Loại sản phẩm": "Bộ vệ sinh Saxophone",
+      "Xuất xứ": "Trung Quốc",
+      "Bảo hành": "6 tháng",
+      "Tình trạng": "Còn hàng",
+      "Đối tượng": "Người dùng saxophone",
+    },
+  },
+  
 ];
 
-export default function ProductDetail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
-
-  const product = products.find(
-    (p) => p.id === Number(id)
-  );
+export default function ProductDetail() {
+  const params = useParams();
   const { addToCart } = useCart();
-  
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [selectedImage, setSelectedImage] = useState("");
+
+  const product = products.find((item) => item.id === Number(params.id));
+
+  useEffect(() => {
+    if (product) {
+      setSelectedImage(product.image);
+      setActiveTab("overview");
+    }
+  }, [product]);
 
   if (!product) {
     return (
-      <div style={{ padding: "50px" }}>
-        <h1>Không tìm thấy sản phẩm</h1>
-      </div>
+      <main className="product-detail-page">
+        <div className="product-detail-card">
+          <div className="product-detail-info">
+            <h1>Không tìm thấy sản phẩm</h1>
+
+            <Link href="/products">
+              <button className="back-btn">Quay lại sản phẩm</button>
+            </Link>
+          </div>
+        </div>
+      </main>
     );
   }
-  
-  
-  
- 
 
+  const handleAddToCart = () => {
+    setShowConfirm(true);
+  };
+
+  const confirmAddToCart = () => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+    });
+
+    setShowConfirm(false);
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 2200);
+  };
 
   return (
-    <div className="detail-container">
-      <div className="detail-card">
+    <main className="product-detail-page">
+      <section className="yamaha-style-detail">
+        <h1 className="yamaha-product-title">{product.name}</h1>
 
-        <div className="detail-image-box">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="detail-image"
-          />
+        <div className="yamaha-detail-layout">
+          <div className="yamaha-left">
+            <div className="yamaha-main-image">
+              <img src={selectedImage || product.image} alt={product.name} />
+            </div>
+
+            <div className="yamaha-gallery">
+              {product.gallery.map((img, index) => (
+                <button
+                  key={index}
+                  className={
+                    selectedImage === img
+                      ? "yamaha-thumb active"
+                      : "yamaha-thumb"
+                  }
+                  onClick={() => setSelectedImage(img)}
+                >
+                  <img src={img} alt={`${product.name} ${index + 1}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="yamaha-right">
+            <div className="yamaha-tabs">
+              <button
+                className={activeTab === "overview" ? "active" : ""}
+                onClick={() => setActiveTab("overview")}
+              >
+                Tổng quan
+              </button>
+
+              <button
+                className={activeTab === "specs" ? "active" : ""}
+                onClick={() => setActiveTab("specs")}
+              >
+                Thông số kỹ thuật
+              </button>
+
+              <button
+                className={activeTab === "download" ? "active" : ""}
+                onClick={() => setActiveTab("download")}
+              >
+                Tải xuống
+              </button>
+            </div>
+
+            {activeTab === "overview" && (
+              <div className="yamaha-tab-content">
+                <p className="product-detail-type">{product.type}</p>
+                <h2>{product.name}</h2>
+                <p className="product-detail-price">{product.price}</p>
+                <p className="product-detail-desc">{product.description}</p>
+
+                <h3>Đặc điểm nổi bật</h3>
+                <ul>
+                  {product.features.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+
+                <div className="product-detail-meta">
+                  <p>
+                    <strong>Thương hiệu:</strong> {product.brand}
+                  </p>
+                  <p>
+                    <strong>Loại kèn:</strong> {product.type}
+                  </p>
+                  <p>
+                    <strong>Xuất xứ:</strong> {product.origin}
+                  </p>
+                  <p>
+                    <strong>Bảo hành:</strong> {product.warranty}
+                  </p>
+                  <p>
+                    <strong>Tình trạng:</strong> {product.status}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "specs" && (
+              <div className="yamaha-tab-content">
+                <h2>Thông số kỹ thuật</h2>
+
+                <div className="yamaha-spec-table">
+                  {Object.entries(product.specs).map(([key, value]) => (
+                    <div className="yamaha-spec-row" key={key}>
+                      <span>{key}</span>
+                      <strong>{value}</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "download" && (
+              <div className="yamaha-tab-content">
+                <h2>Tài liệu sản phẩm</h2>
+                <p>
+                  Tài liệu hướng dẫn, hình ảnh chi tiết và file thông tin sản
+                  phẩm sẽ được cập nhật sau.
+                </p>
+
+                <button className="download-btn">
+                  Chưa có tài liệu tải xuống
+                </button>
+              </div>
+            )}
+
+            <div className="product-detail-actions">
+              <button onClick={handleAddToCart}>Thêm Vào Giỏ Hàng</button>
+
+              <Link href="/products">
+                <button className="back-btn">Quay Lại</button>
+              </Link>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="detail-info">
-          <h1>{product.name}</h1>
+      {showConfirm && (
+        <div className="cart-popup-overlay">
+          <div className="cart-popup">
+            <div className="cart-popup-icon">🛒</div>
 
-          <p className="detail-price">
-            {product.price}
-          </p>
-
-          <div className="product-meta">
-            <p>
-              <strong>Thương hiệu:</strong> {product.brand}
-            </p>
+            <h2>Xác nhận thêm giỏ hàng</h2>
 
             <p>
-              <strong>Loại:</strong> {product.type}
+              Bạn có chắc muốn thêm <strong>{product.name}</strong> vào giỏ
+              hàng không?
             </p>
 
-            <p>
-              <strong>Tình trạng:</strong> Còn hàng
-            </p>
-          </div>
+            <div className="cart-popup-actions">
+              <button onClick={confirmAddToCart} className="confirm-btn">
+                Đồng Ý
+              </button>
 
-          <div className="description">
-            <h3>Mô tả sản phẩm</h3>
-
-            <p>
-              {product.description}
-            </p>
-          </div>
-
-          <div className="button-group">
-            
- <button
-  className="buy-btn"
-  onClick={() =>
-   addToCart({
-  id: product.id,
-  name: product.name,
-  price: product.price,
-  image: product.image,
-  quantity: 1,
-})
-  }
->
-  🛒 Thêm vào giỏ hàng
-</button>
-
-           <a
-  href={`https://zalo.me/0703705421?text=Tôi muốn tư vấn sản phẩm ${product.name}`}
-  target="_blank"
->
-  <button className="contact-btn">
-    📞 Liên hệ Zalo
-  </button>
-</a>
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="cancel-btn"
+              >
+                Hủy
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-      </div>
-    </div>
+      {showSuccess && (
+        <div className="cart-success-toast">
+          ✅ Đã thêm {product.name} vào giỏ hàng!
+        </div>
+      )}
+    </main>
   );
 }

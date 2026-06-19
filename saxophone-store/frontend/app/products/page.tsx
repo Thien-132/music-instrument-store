@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const products = [
   {
@@ -27,8 +28,6 @@ const products = [
     price: 12000000,
     image: "/images/conn-as650.jpg",
   },
-
-  // TENOR SAXOPHONE
   {
     id: 4,
     name: "Yamaha YTS-280",
@@ -53,8 +52,6 @@ const products = [
     price: 35000000,
     image: "/images/jupiter-jts700.jpg",
   },
-
-  // SOPRANO SAXOPHONE
   {
     id: 7,
     name: "Yamaha YSS475",
@@ -79,8 +76,6 @@ const products = [
     price: 39000000,
     image: "/images/jupiter-jss1000.jpg",
   },
-
-  // MOUTHPIECE
   {
     id: 10,
     name: "Yamaha 4C Mouthpiece",
@@ -105,8 +100,6 @@ const products = [
     price: 2800000,
     image: "/images/vandoren-al3-mouthpiece.jpg",
   },
-
-  // PHỤ KIỆN
   {
     id: 13,
     name: "Dây Đeo Saxophone",
@@ -133,41 +126,30 @@ const products = [
   },
 ];
 
-const categoryItems = [
-  {
-    name: "Alto Saxophone",
-    image: "/images/yamaha-yas280.jpg",
-    value: "Alto Saxophone",
-  },
-  {
-    name: "Tenor Saxophone",
-    image: "/images/yamaha-yts280.jpg",
-    value: "Tenor Saxophone",
-  },
-  {
-    name: "Soprano Saxophone",
-    image: "/images/selmer-as500.jpg",
-    value: "Soprano Saxophone",
-  },
-  {
-    name: "Mouthpiece",
-    image: "/images/mouthpiece.jpg",
-    value: "Mouthpiece",
-  },
-  {
-    name: "Phụ Kiện",
-    image: "/images/accessory.jpg",
-    value: "Phụ Kiện",
-  },
-];
-
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get("q")?.trim().toLowerCase() || "";
+
+  const filteredProducts = products.filter((product) => {
+    const name = product.name.toLowerCase();
+    const brand = product.brand.toLowerCase();
+    const type = product.type.toLowerCase();
+
+    return (
+      name.includes(q) ||
+      brand.includes(q) ||
+      type.includes(q)
+    );
+  });
+
   return (
     <main>
-      <h1 className="section-title">Danh Sách Sản Phẩm</h1>
+      <h1 className="section-title">
+        {q ? `Kết quả tìm kiếm: ${q}` : "Danh Sách Sản Phẩm"}
+      </h1>
 
       <section className="products">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <div className="card" key={product.id}>
             <img src={product.image} alt={product.name} />
 
@@ -185,6 +167,12 @@ export default function ProductsPage() {
           </div>
         ))}
       </section>
+
+      {filteredProducts.length === 0 && (
+        <p className="no-product">
+          Không tìm thấy sản phẩm phù hợp.
+        </p>
+      )}
     </main>
   );
 }

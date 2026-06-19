@@ -2,6 +2,7 @@ import "./globals.css";
 import { CartProvider } from "./context/CartContext";
 import CartButton from "./components/CartButton";
 import { Poppins } from "next/font/google";
+import Link from "next/link";
 
 const poppins = Poppins({
   subsets: ["latin", "vietnamese"],
@@ -23,26 +24,30 @@ export default function RootLayout({
       <body className={poppins.className}>
         <CartProvider>
           <header className="header">
-            <div className="logo">
+            <Link href="/" className="logo">
               <h1>NhomTTTN Music</h1>
               <p>Website bán nhạc cụ & Saxophone</p>
-            </div>
+            </Link>
 
-            <div className="search">
-              <input type="text" placeholder="Tìm kiếm sản phẩm..." />
-            </div>
+            <form action="/products" className="search">
+              <input
+                type="text"
+                name="q"
+                placeholder="Tìm kiếm sản phẩm..."
+              />
+            </form>
 
             <CartButton />
           </header>
 
           <nav className="menu">
-            <a href="/">Trang Chủ</a>
-            <a href="/products">Sản Phẩm</a>
-            <a href="/cart">Giỏ Hàng</a>
-            <a href="/orders">Đơn Đã Mua</a>
-            <a href="/login">Đăng Nhập</a>
-            <a href="/register">Đăng Ký</a>
-            <a href="/admin">Admin</a>
+            <Link href="/">Trang Chủ</Link>
+            <Link href="/products">Sản Phẩm</Link>
+            <Link href="/cart">Giỏ Hàng</Link>
+            <Link href="/orders">Đơn Đã Mua</Link>
+            <Link href="/login">Đăng Nhập</Link>
+            <Link href="/register">Đăng Ký</Link>
+            <Link href="/admin">Admin</Link>
           </nav>
 
           {children}
@@ -53,7 +58,7 @@ export default function RootLayout({
                 <h3>NhomTTTN Music</h3>
                 <p>Chuyên cung cấp Saxophone chính hãng.</p>
                 <p>📍 TP. Hồ Chí Minh, Việt Nam</p>
-                <p>📞 0900 123 456</p>
+                <p>📞 0912 19 12 18</p>
                 <p>✉️ support@nhomtttnmusic.vn</p>
               </div>
 
@@ -76,10 +81,26 @@ export default function RootLayout({
               <div className="footer-column">
                 <h3>Kết Nối</h3>
                 <div className="social-icons">
-                  <a href="#">Facebook</a>
-                  <a href="#">Zalo</a>
-                  <a href="#">YouTube</a>
-                </div>
+  <a
+    href="https://www.facebook.com/tran.thien.208979/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Facebook
+  </a>
+
+  <a
+    href="https://zalo.me/0912191218"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Zalo
+  </a>
+
+  <a href="mailto:support@nhomtttnmusic.vn">
+    Email
+  </a>
+</div>
               </div>
             </div>
 

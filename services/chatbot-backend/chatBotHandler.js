@@ -31,7 +31,7 @@ export const handler = async (event) => {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-      },
+      },    
       body: JSON.stringify({ messages }),
     };
   } catch (error) {

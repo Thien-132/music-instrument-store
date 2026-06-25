@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       botId: process.env.LEX_BOT_ID!,
       botAliasId: process.env.LEX_BOT_ALIAS_ID!,
       localeId: "en_US", // Nếu bạn cấu hình bot Tiếng Anh
-      sessionId: sessionId || "default-session", // SessionId định danh cuộc hội thoại
+      sessionId: sessionId || `session-${Date.now()}`, // SessionId định danh cuộc hội thoại
       text: text,
     };
 

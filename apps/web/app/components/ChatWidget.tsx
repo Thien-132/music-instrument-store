@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 // Import thư viện Amplify để lấy token của User đang đăng nhập
-import { fetchAuthSession } from "aws-amplify/auth";
+import { fetchAuthSession } from "@aws-amplify/auth";
 
 interface Message {
   text: string;

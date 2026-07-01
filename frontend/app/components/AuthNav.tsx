@@ -95,15 +95,16 @@ export default function AuthNav() {
     const displayName = user.name || user.email || user.username;
     return (
       <>
-        <Link href="/profile" className="user-welcome hover:text-emerald-800 transition-colors">
-          Xin chào, {displayName}
+        <Link href="/profile" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          {displayName}
         </Link>
         {(isAdmin || isStaff) && (
-          <Link href="/admin" className="admin-link">
+          <Link href="/admin" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
             Quản Trị
           </Link>
         )}
-        <button onClick={handleSignOut} className="signout-btn">
+        <button onClick={handleSignOut} style={{ background: 'none', border: 'none', color: '#DF9E47', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
           Đăng Xuất
         </button>
       </>
@@ -112,7 +113,10 @@ export default function AuthNav() {
  
   return (
     <>
-      <Link href="/login">Đăng Nhập</Link>
+      <Link href="/login" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', transition: 'color 0.2s', whiteSpace: 'nowrap' }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        ĐĂNG NHẬP
+      </Link>
     </>
   );
 }

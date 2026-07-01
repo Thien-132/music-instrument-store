@@ -2,18 +2,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #003527;
-  --color-primary-container: #064e3b;
+  --color-primary: #002B1F;
+  --color-primary-container: #054030;
   --color-on-primary: #ffffff;
-  --color-secondary: #904d00;
-  --color-secondary-container: #fe932c;
+  --color-secondary: #C58A3E;
+  --color-secondary-container: #DF9E47;
   --color-on-secondary: #ffffff;
-  --color-gold-muted: #b45309;
-  --color-background: #f7f9fb;
-  --color-surface-cream: #faf9f6;
-  --color-border-subtle: #e2e8f0;
-  --color-on-surface: #191c1e;
-  --color-on-surface-variant: #404944;
+  --color-gold-muted: #A36B2B;
+  --color-background: #FCFCFC;
+  --color-surface-cream: #F8F5F0;
+  --color-border-subtle: #E8E5E1;
+  --color-on-surface: #1A1A1A;
+  --color-on-surface-variant: #4A4A4A;
   --color-on-secondary-container: #663500;
   --color-primary-fixed: #b0f0d6;
   --color-surface-container-highest: #e0e3e5;
@@ -121,20 +121,18 @@
 }
 
 :root {
-  --color-primary: #003527;
-  --color-primary-container: #064e3b;
+  --color-primary: #002B1F;
+  --color-primary-container: #054030;
   --color-on-primary: #ffffff;
-  --color-secondary: #d97706;
-  --color-secondary-container: #fe932c;
+  --color-secondary: #C58A3E;
+  --color-secondary-container: #DF9E47;
   --color-on-secondary: #ffffff;
-  --color-gold-muted: #b45309;
-  --color-background: #f7f9fb;
-  --color-surface-cream: #faf9f6;
-  --color-border-subtle: #e2e8f0;
-  --color-on-surface: #191c1e;
-  --color-on-surface-variant: #404944;
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-gold-muted: #A36B2B;
+  --color-background: #FCFCFC;
+  --color-surface-cream: #F8F5F0;
+  --color-border-subtle: #E8E5E1;
+  --color-on-surface: #1A1A1A;
+  --color-on-surface-variant: #4A4A4A;
   --rounded-sm: 0.25rem;
   --rounded-lg: 0.5rem;
 }
@@ -159,6 +157,16 @@ body {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Override Browser Autofill Background for Luxury Look */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: var(--color-on-surface) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Heading Typography */
@@ -340,18 +348,20 @@ button {
 
 /* PREMIUM HERO */
 .premium-hero {
-  margin: 3rem 0;
-  padding: 4rem 5%;
-  border-radius: var(--rounded-sm);
+  margin: 2rem 0 4rem;
+  padding: 5rem 6%;
+  border-radius: var(--rounded-lg);
   background-color: var(--color-primary);
-  background-image: radial-gradient(circle at 80% 40%, rgba(217, 119, 6, 0.15), transparent 40%),
-                    radial-gradient(circle at 20% 80%, rgba(6, 78, 59, 0.4), transparent 45%);
+  background-image: radial-gradient(circle at 85% 30%, rgba(197, 138, 62, 0.25), transparent 45%),
+                    radial-gradient(circle at 15% 85%, rgba(5, 64, 48, 0.8), transparent 50%),
+                    linear-gradient(135deg, var(--color-primary) 0%, #001a12 100%);
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   align-items: center;
-  gap: 3rem;
+  gap: 4rem;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 24px 50px rgba(0, 43, 31, 0.15);
 }
 
 .premium-content {
@@ -362,14 +372,14 @@ button {
 
 .hero-badge {
   display: inline-block;
-  padding: 6px 12px;
-  border-radius: var(--rounded-sm);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(197, 138, 62, 0.15);
+  border: 1px solid rgba(197, 138, 62, 0.4);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   color: var(--color-secondary-container);
   margin-bottom: 1.5rem;
 }
@@ -427,36 +437,46 @@ button {
 
 .hero-actions {
   display: flex;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .primary-btn {
   background-color: var(--color-secondary);
   color: white;
   border: none;
-  padding: 12px 28px;
-  font-size: 14px;
+  padding: 14px 32px;
+  font-size: 13px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  border-radius: var(--rounded-sm);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(197, 138, 62, 0.25);
 }
 
 .primary-btn:hover {
-  background-color: #b45309;
+  background-color: var(--color-secondary-container);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(197, 138, 62, 0.35);
 }
 
 .secondary-btn {
   background-color: transparent;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 12px 28px;
-  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 14px 32px;
+  font-size: 13px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  border-radius: var(--rounded-sm);
+  transition: all 0.3s ease;
 }
 
 .secondary-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
   border-color: white;
+  transform: translateY(-2px);
 }
 
 .premium-image-box {

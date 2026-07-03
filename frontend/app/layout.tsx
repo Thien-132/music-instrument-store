@@ -48,46 +48,48 @@ export default function RootLayout({
                 </>
               }
               footer={
-                <footer className="bg-gray-900 text-white py-12 border-t-2 border-yellow-600">
-                  <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-4 gap-8 mb-8">
+                <footer>
+                  <div className="container">
+                    <div className="grid grid-4 gap-8 mb-8">
                       <div>
-                        <h3 className="text-xl font-bold mb-4">AUREATE FOREST</h3>
-                        <p className="text-gray-400 mb-4">Chuyên cung cấp Saxophone chính hãng, âm thanh chuẩn mực cho nghệ sĩ chuyên nghiệp.</p>
-                        <p className="text-gray-400 text-sm mb-2">📍 TP. Hồ Chí Minh, Việt Nam</p>
-                        <p className="text-gray-400 text-sm mb-2">📞 0912 19 12 18</p>
-                        <p className="text-gray-400 text-sm">📧 support@nhomtttnmusic.vn</p>
+                        <h3 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "1rem" }}>AUREATE FOREST</h3>
+                        <p style={{ fontSize: "14px", lineHeight: "1.6", marginBottom: "1.5rem" }}>
+                          Chuyên cung cấp Saxophone chính hãng, âm thanh chuẩn mực cho nghệ sĩ chuyên nghiệp.
+                        </p>
+                        <p style={{ fontSize: "14px", marginBottom: "0.5rem" }}>📍 TP. Hồ Chí Minh, Việt Nam</p>
+                        <p style={{ fontSize: "14px", marginBottom: "0.5rem" }}>📞 0912 19 12 18</p>
+                        <p style={{ fontSize: "14px" }}>📧 support@nhomtttnmusic.vn</p>
                       </div>
                       <div>
-                        <h4 className="text-lg font-bold mb-4">THÔNG TIN</h4>
-                        <ul className="space-y-2 text-gray-400">
-                          <li><Link href="/about" className="hover:text-yellow-600">Giới thiệu</Link></li>
-                          <li><Link href="#" className="hover:text-yellow-600">Chính sách bảo hành</Link></li>
-                          <li><Link href="#" className="hover:text-yellow-600">Chính sách đổi trả</Link></li>
-                          <li><Link href="#" className="hover:text-yellow-600">Điều khoản sử dụng</Link></li>
-                          <li><Link href="#" className="hover:text-yellow-600">Hướng dẫn mua hàng</Link></li>
+                        <h4 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "1.5rem", textTransform: "uppercase" }}>Thông tin</h4>
+                        <ul style={{ listStyle: "none" }}>
+                          <li style={{ marginBottom: "0.75rem" }}><Link href="/about">Giới thiệu</Link></li>
+                          <li style={{ marginBottom: "0.75rem" }}><Link href="#">Chính sách bảo hành</Link></li>
+                          <li style={{ marginBottom: "0.75rem" }}><Link href="#">Chính sách đổi trả</Link></li>
+                          <li style={{ marginBottom: "0.75rem" }}><Link href="#">Điều khoản sử dụng</Link></li>
+                          <li><Link href="#">Hướng dẫn mua hàng</Link></li>
                         </ul>
                       </div>
                       <div>
-                        <h4 className="text-lg font-bold mb-4">DANH MỤC</h4>
-                        <ul className="space-y-2 text-gray-400">
-                          <li><Link href="/products?category=Alto%20Saxophone" className="hover:text-yellow-600">Alto Saxophone</Link></li>
-                          <li><Link href="/products?category=Tenor%20Saxophone" className="hover:text-yellow-600">Tenor Saxophone</Link></li>
-                          <li><Link href="/products?category=Soprano%20Saxophone" className="hover:text-yellow-600">Soprano Saxophone</Link></li>
-                          <li><Link href="/products?category=Phụ%20kiện%20Saxophone" className="hover:text-yellow-600">Phụ kiện</Link></li>
+                        <h4 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "1.5rem", textTransform: "uppercase" }}>Danh mục</h4>
+                        <ul style={{ listStyle: "none" }}>
+                          <li style={{ marginBottom: "0.75rem" }}><Link href="/products?category=Alto%20Saxophone">Alto Saxophone</Link></li>
+                          <li style={{ marginBottom: "0.75rem" }}><Link href="/products?category=Tenor%20Saxophone">Tenor Saxophone</Link></li>
+                          <li style={{ marginBottom: "0.75rem" }}><Link href="/products?category=Soprano%20Saxophone">Soprano Saxophone</Link></li>
+                          <li><Link href="/products">Xem tất cả</Link></li>
                         </ul>
                       </div>
                       <div>
-                        <h4 className="text-lg font-bold mb-4">KẾT NỐI</h4>
-                        <ul className="space-y-2 text-gray-400">
-                          <li><a href="#" className="hover:text-yellow-600">Facebook</a></li>
-                          <li><a href="#" className="hover:text-yellow-600">Zalo</a></li>
-                          <li><a href="#" className="hover:text-yellow-600">Instagram</a></li>
-                          <li><a href="#" className="hover:text-yellow-600">YouTube</a></li>
+                        <h4 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "1.5rem", textTransform: "uppercase" }}>Kết nối</h4>
+                        <ul style={{ listStyle: "none" }}>
+                          <li style={{ marginBottom: "0.75rem" }}><a href="#">Facebook</a></li>
+                          <li style={{ marginBottom: "0.75rem" }}><a href="#">Zalo</a></li>
+                          <li style={{ marginBottom: "0.75rem" }}><a href="#">Instagram</a></li>
+                          <li><a href="#">YouTube</a></li>
                         </ul>
                       </div>
                     </div>
-                    <div className="border-t border-gray-700 pt-6 text-center text-gray-500 text-sm">
+                    <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.2)", paddingTop: "2rem", textAlign: "center", fontSize: "12px" }}>
                       © 2026 AUREATE FOREST | AWS CLOUD PROJECT
                     </div>
                   </div>

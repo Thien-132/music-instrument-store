@@ -1,5 +1,43 @@
 @import "tailwindcss";
 
+:root {
+  /* Colors - Aureate Forest Palette */
+  --color-primary: #064e3b;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #054030;
+  --color-on-primary-container: #80bea6;
+
+  --color-secondary: #d97706;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fe932c;
+  --color-on-secondary-container: #663500;
+
+  --color-surface: #ffffff;
+  --color-surface-dim: #d8dadc;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #404944;
+
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+
+  --color-outline: #707974;
+  --color-outline-variant: #bfc9c3;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+
+  --color-surface-cream: #faf9f6;
+  --color-border-subtle: #e2e8f0;
+  --color-gold-muted: #b45309;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -11,9 +49,9 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #ffffff;
-  color: #000000;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
   line-height: 1.6;
 }
 
@@ -22,17 +60,301 @@ a {
   color: inherit;
 }
 
+/* Typography */
 h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", serif;
   font-weight: 600;
-  margin-bottom: 1rem;
+  color: var(--color-on-surface);
 }
 
-button {
+h1 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h4, h5, h6 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-lg {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-sm {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Buttons */
+button, .btn {
+  border-radius: 0.25rem;
   cursor: pointer;
-  border: none;
-  font-family: inherit;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 12px 24px;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #053d2e;
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+  padding: 12px 24px;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #c66f00;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  padding: 12px 24px;
+}
+
+.btn-outline:hover {
+  background-color: var(--color-surface-container-low);
+}
+
+/* Inputs */
 input, textarea, select {
-  font-family: inherit;
+  font-family: "Inter", sans-serif;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.25rem;
+  padding: 10px 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(6, 78, 59, 0.1);
+}
+
+/* Cards */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.25rem;
+  padding: 0;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--color-secondary);
+  box-shadow: 0 20px 40px rgba(6, 78, 59, 0.05);
+}
+
+.card-image {
+  width: 100%;
+  height: 240px;
+  background-color: var(--color-surface-container-low);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-image img {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.card-title {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  color: var(--color-on-surface);
+}
+
+.card-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-gold-muted);
+  margin-bottom: 1.5rem;
+  margin-top: auto;
+}
+
+/* Layout */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 5vw, 4rem);
+}
+
+section {
+  padding: 4rem 0;
+}
+
+section:nth-child(even) {
+  background-color: var(--color-surface-cream);
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Header */
+header {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--color-primary-container);
+}
+
+header a {
+  color: var(--color-on-primary);
+}
+
+header a:hover {
+  color: var(--color-secondary);
+}
+
+/* Footer */
+footer {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 4rem 0 2rem;
+  margin-top: 8rem;
+}
+
+footer a {
+  color: var(--color-on-primary);
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: var(--color-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 32px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .grid-3, .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  section {
+    padding: 2rem 0;
+  }
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.gap-4 {
+  gap: 1.5rem;
+}
+
+.py-8 {
+  padding: 2rem 0;
 }

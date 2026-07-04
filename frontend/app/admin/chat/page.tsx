@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { fetchAuthSession } from "aws-amplify/auth";
 import MusicLoading from "../../components/common/MusicLoading";
-import { Send, User, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { Send, User, CheckCircle2, AlertCircle, XCircle, Download, Paperclip } from "lucide-react";
 
 interface ChatSession {
   sessionId: string;
@@ -24,6 +24,14 @@ interface Message {
   createdAt: string;
 }
 
+const EMOJIS = ["😊", "👍", "❤️", "🎷", "👋", "🙏", "😮", "🎉"];
+
+const formatSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 export default function AdminChatPage() {
   const [waitingSessions, setWaitingSessions] = useState<ChatSession[]>([]);
   const [activeSessions, setActiveSessions] = useState<ChatSession[]>([]);
@@ -35,6 +43,7 @@ export default function AdminChatPage() {
   const [staffInfo, setStaffInfo] = useState<{ email: string; name: string } | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 1. Tải thông tin Nhân viên đang đăng nhập
   useEffect(() => {
@@ -138,7 +147,6 @@ export default function AdminChatPage() {
 
       if (res.ok) {
         await fetchSessions();
-        // Cập nhật session hiện tại sang CONNECTED để hiển thị khung chat
         setSelectedSession({
           ...session,
           status: "HUMAN_CONNECTED",
@@ -167,6 +175,8 @@ export default function AdminChatPage() {
       });
 
       if (res.ok) {
+        // Tải xuống bản sao lưu trước khi đóng phiên (Tùy chọn)
+        handleDownloadBackup();
         await fetchSessions();
         setSelectedSession(null);
       }
@@ -200,7 +210,6 @@ export default function AdminChatPage() {
       });
 
       if (res.ok) {
-        // Tải lại lịch sử tin nhắn ngay lập tức
         await fetchHistory(selectedSession.sessionId);
       }
     } catch (err) {
@@ -208,6 +217,146 @@ export default function AdminChatPage() {
     } finally {
       setIsSending(false);
     }
+  };
+
+  // 7. Nhân viên tải lên file đính kèm
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedSession || !staffInfo) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Kích thước file tối đa cho phép là 5MB.");
+      return;
+    }
+
+    setIsSending(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const uploadRes = await fetch("/api/chat/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        const errorData = await uploadRes.json();
+        throw new Error(errorData.error || "Tải file lên thất bại");
+      }
+
+      const uploadData = await uploadRes.json();
+      
+      const fileMsgText = `[FILE:${uploadData.url}|${uploadData.fileName}|${uploadData.fileType}|${uploadData.fileSize}]`;
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: fileMsgText,
+          sessionId: selectedSession.sessionId,
+          userEmail: staffInfo.email,
+          userName: staffInfo.name,
+          sender: "STAFF",
+          senderName: staffInfo.name,
+        }),
+      });
+
+      if (res.ok) {
+        await fetchHistory(selectedSession.sessionId);
+      }
+    } catch (err: any) {
+      console.error("Staff upload file error:", err);
+      alert(err.message || "Không thể gửi file lúc này.");
+    } finally {
+      setIsSending(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // 8. Tải bản sao lưu cuộc trò chuyện dưới dạng file TXT
+  const handleDownloadBackup = () => {
+    if (!selectedSession || messages.length === 0) return;
+
+    const timeString = new Date().toLocaleString("vi-VN");
+    const header = `=== SAO LƯU CUỘC TRÒ CHUYỆN (MUSIC STORE) ===\n` +
+      `Mã phiên: ${selectedSession.sessionId}\n` +
+      `Khách hàng: ${selectedSession.userName} (${selectedSession.userId})\n` +
+      `Nhân viên hỗ trợ: ${selectedSession.assignedStaffName || staffInfo?.name || "N/A"}\n` +
+      `Thời gian xuất file: ${timeString}\n` +
+      `Trạng thái phiên: ${selectedSession.status}\n` +
+      `===========================================\n\n`;
+
+    const body = messages
+      .map((m) => {
+        const time = new Date(m.createdAt).toLocaleTimeString("vi-VN");
+        const sender = m.sender.toUpperCase() === "STAFF" 
+          ? `Nhân viên [${m.senderName}]` 
+          : m.sender.toUpperCase() === "BOT" 
+          ? "Trợ lý ảo AI" 
+          : `Khách hàng [${m.senderName}]`;
+        
+        let text = m.text;
+        if (text.startsWith("[FILE:") && text.endsWith("]")) {
+          const content = text.slice(6, -1);
+          const [url, filename, mime, size] = content.split("|");
+          text = `[Đính kèm file: ${filename} (${formatSize(parseInt(size))}) | Link tải: ${url}]`;
+        }
+
+        return `[${time}] ${sender}: ${text}`;
+      })
+      .join("\n");
+
+    const blob = new Blob([header + body], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    
+    const safeName = selectedSession.userName.replace(/[^a-zA-Z0-9]/g, "_");
+    link.download = `Sao_Luu_Chat_${safeName}_${selectedSession.sessionId.substring(0, 8)}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const renderMessageContent = (text: string) => {
+    if (text.startsWith("[FILE:") && text.endsWith("]")) {
+      const content = text.slice(6, -1);
+      const [url, filename, mimeType, sizeStr] = content.split("|");
+      const size = parseInt(sizeStr || "0", 10);
+      const isImage = mimeType?.startsWith("image/");
+
+      if (isImage) {
+        return (
+          <div className="space-y-1.5 max-w-full">
+            <a href={url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border border-slate-200/50 bg-white">
+              <img src={url} alt={filename} className="max-w-full max-h-[180px] object-cover hover:scale-[1.02] transition-transform duration-200" />
+            </a>
+            <span className="text-[9px] opacity-75 truncate block">{filename} ({formatSize(size)})</span>
+          </div>
+        );
+      }
+
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={filename}
+          className="flex items-center gap-2.5 p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl transition-colors border border-slate-250 max-w-[280px] group"
+        >
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center text-lg shadow-sm shrink-0">
+            {mimeType === "application/pdf" ? "📕" : "📄"}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold truncate group-hover:underline text-slate-800">{filename}</p>
+            <p className="text-[9px] text-slate-500 mt-0.5">{formatSize(size)}</p>
+          </div>
+        </a>
+      );
+    }
+
+    return <span>{text}</span>;
   };
 
   if (isLoading && waitingSessions.length === 0 && activeSessions.length === 0) {
@@ -323,6 +472,17 @@ export default function AdminChatPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                {messages.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleDownloadBackup}
+                    className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-250 text-slate-700 font-semibold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer border border-slate-200"
+                    title="Sao lưu lịch sử chat"
+                  >
+                    Sao lưu <Download className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
                 {selectedSession.status === "HUMAN_CONNECTED" ? (
                   <button
                     type="button"
@@ -347,10 +507,10 @@ export default function AdminChatPage() {
             <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/40">
               {messages.length > 0 ? (
                 messages.map((msg, index) => {
-                  const isStaff = msg.sender === "staff";
-                  const isBot = msg.sender === "bot";
+                  const isStaff = msg.sender.toUpperCase() === "STAFF";
+                  const isBot = msg.sender.toUpperCase() === "BOT";
                   
-                  if (msg.sender === "system") {
+                  if (msg.sender.toUpperCase() === "SYSTEM") {
                     return (
                       <div key={index} className="text-center text-[10.5px] text-slate-500 italic py-1 bg-slate-100 rounded-lg max-w-sm mx-auto">
                         {msg.text}
@@ -360,7 +520,7 @@ export default function AdminChatPage() {
 
                   return (
                     <div key={index} className={`flex flex-col ${isStaff ? "items-end" : "items-start"}`}>
-                      <span className="text-[9px] text-slate-400 mb-1 px-1">
+                      <span className="text-[9px] text-slate-400 mb-1 px-1 font-medium">
                         {isStaff ? msg.senderName || "Tôi" : msg.senderName || (isBot ? "Trợ lý ảo" : "Khách")} • {new Date(msg.createdAt).toLocaleTimeString("vi-VN")}
                       </span>
                       <div
@@ -372,7 +532,7 @@ export default function AdminChatPage() {
                             : "bg-white text-slate-800 rounded-tl-none border border-slate-100"
                         }`}
                       >
-                        {msg.text}
+                        {renderMessageContent(msg.text)}
                       </div>
                     </div>
                   );
@@ -386,9 +546,44 @@ export default function AdminChatPage() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Emoji shortcuts bar for Admin */}
+            {selectedSession.status === "HUMAN_CONNECTED" && (
+              <div className="px-4 pt-2 bg-white border-t border-slate-100 flex items-center justify-between gap-2 shrink-0">
+                <div className="flex gap-2 overflow-x-auto py-0.5">
+                  {EMOJIS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => setInput((prev) => prev + emoji)}
+                      className="text-base hover:scale-125 transition-transform cursor-pointer p-0.5"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+            )}
+
             {/* Input Tin Nhắn */}
             {selectedSession.status === "HUMAN_CONNECTED" ? (
-              <div className="p-4 bg-white border-t border-slate-100 flex items-center gap-3 shrink-0">
+              <div className="p-4 bg-white flex items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isSending}
+                  className="w-12 h-12 bg-slate-100 hover:bg-slate-250 text-slate-500 flex items-center justify-center rounded-xl transition-all active:scale-[0.93] disabled:opacity-40 cursor-pointer border border-slate-200"
+                  title="Đính kèm file (Tối đa 5MB)"
+                >
+                  <Paperclip className="w-4 h-4" />
+                </button>
+
                 <input
                   type="text"
                   value={input}
@@ -397,6 +592,7 @@ export default function AdminChatPage() {
                   placeholder={`Gửi phản hồi cho ${selectedSession.userName}...`}
                   className="flex-1 bg-slate-50 border border-slate-150 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-[#002B1F] transition-all"
                 />
+                
                 <button
                   type="button"
                   onClick={handleSendMessage}

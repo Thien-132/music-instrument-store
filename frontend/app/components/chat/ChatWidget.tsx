@@ -3,7 +3,7 @@
 import "../common/AmplifyConfig";
 import { useState, useRef, useEffect } from "react";
 import { fetchAuthSession } from "aws-amplify/auth";
-import { MessageSquare, Send, X, ArrowUpRight } from "lucide-react";
+import { MessageSquare, Send, X, ArrowUpRight, Paperclip } from "lucide-react";
 
 interface Message {
   text: string;
@@ -11,6 +11,14 @@ interface Message {
   senderName?: string;
   createdAt?: string;
 }
+
+const EMOJIS = ["😊", "👍", "❤️", "🎷", "👋", "🙏", "😮", "🎉"];
+
+const formatSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +32,7 @@ export default function ChatWidget() {
   const [userProfile, setUserProfile] = useState<{ email?: string; name?: string } | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Khởi tạo SessionId định danh cuộc hội thoại của khách hàng (lưu ở sessionStorage để giữ phiên khi F5)
   const [sessionId] = useState(() => {
@@ -89,6 +98,8 @@ export default function ChatWidget() {
     if (isOpen) {
       fetchHistory();
     }
+    // Dispatch event to notify FloatingContacts to hide/show itself
+    window.dispatchEvent(new CustomEvent("chat-widget-toggle", { detail: { isOpen } }));
   }, [isOpen]);
 
   // Cuộn xuống tin nhắn mới nhất
@@ -209,6 +220,120 @@ export default function ChatWidget() {
     }
   };
 
+  // Tải file đính kèm lên
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Giới hạn 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Kích thước file tối đa cho phép là 5MB.");
+      return;
+    }
+
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const uploadRes = await fetch("/api/chat/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        const errorData = await uploadRes.json();
+        throw new Error(errorData.error || "Tải file lên thất bại");
+      }
+
+      const uploadData = await uploadRes.json();
+      
+      // Định dạng tin nhắn đặc biệt chứa thông tin file
+      const fileMsgText = `[FILE:${uploadData.url}|${uploadData.fileName}|${uploadData.fileType}|${uploadData.fileSize}]`;
+
+      const tempUserMessage: Message = {
+        text: fileMsgText,
+        sender: "user",
+        senderName: userProfile?.name || "Khách",
+        createdAt: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, tempUserMessage]);
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: fileMsgText,
+          sessionId,
+          userEmail: userProfile?.email || "",
+          userName: userProfile?.name || "Khách",
+        }),
+      });
+
+      if (!res.ok) throw new Error("Gửi tin nhắn chứa file thất bại");
+
+      const data = await res.json();
+      
+      if (data.messages && data.messages.length > 0) {
+        data.messages.forEach((msg: string) => {
+          setMessages((prev) => [
+            ...prev,
+            { text: msg, sender: "bot", senderName: "Trợ lý ảo", createdAt: new Date().toISOString() }
+          ]);
+        });
+      }
+      
+      await fetchHistory();
+    } catch (err: any) {
+      console.error("File upload sending error:", err);
+      alert(err.message || "Không thể gửi file đính kèm.");
+    } finally {
+      setIsLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const renderMessageContent = (text: string) => {
+    if (text.startsWith("[FILE:") && text.endsWith("]")) {
+      const content = text.slice(6, -1);
+      const [url, filename, mimeType, sizeStr] = content.split("|");
+      const size = parseInt(sizeStr || "0", 10);
+      const isImage = mimeType?.startsWith("image/");
+
+      if (isImage) {
+        return (
+          <div className="space-y-1.5 max-w-full">
+            <a href={url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border border-slate-200/50 bg-white">
+              <img src={url} alt={filename} className="max-w-full max-h-[160px] object-cover hover:scale-[1.02] transition-transform duration-200" />
+            </a>
+            <span className="text-[9px] opacity-75 truncate block">{filename} ({formatSize(size)})</span>
+          </div>
+        );
+      }
+
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={filename}
+          className="flex items-center gap-2.5 p-2.5 bg-slate-100 dark:bg-[#031d16] hover:bg-slate-200 dark:hover:bg-[#053c2f] text-slate-800 dark:text-emerald-50 rounded-xl transition-colors border border-slate-200/30 max-w-[240px] group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-[#06261d] flex items-center justify-center text-base shadow-sm shrink-0">
+            {mimeType === "application/pdf" ? "📕" : "📄"}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold truncate group-hover:underline">{filename}</p>
+            <p className="text-[9px] text-slate-500 dark:text-emerald-100/50 mt-0.5">{formatSize(size)}</p>
+          </div>
+        </a>
+      );
+    }
+
+    return <span>{text}</span>;
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-55 font-sans">
       {isOpen ? (
@@ -272,7 +397,7 @@ export default function ChatWidget() {
                         : "bg-white dark:bg-[#06261d] text-slate-800 dark:text-emerald-50 rounded-tl-none border border-slate-100 dark:border-primary-container/20"
                     }`}
                   >
-                    {msg.text}
+                    {renderMessageContent(msg.text)}
                   </div>
                 </div>
               );
@@ -294,8 +419,45 @@ export default function ChatWidget() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Emoji Shortcuts & File upload indicator */}
+          <div className="px-3 pt-2 bg-white dark:bg-[#06261d] border-t border-slate-100 dark:border-primary-container/10 flex items-center justify-between gap-2">
+            {/* Emoji quick selects */}
+            <div className="flex gap-1.5 overflow-x-auto py-0.5">
+              {EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => setInput((prev) => prev + emoji)}
+                  disabled={sessionStatus === "CLOSED"}
+                  className="text-sm hover:scale-125 transition-transform cursor-pointer p-0.5 disabled:opacity-40 disabled:scale-100"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              disabled={sessionStatus === "CLOSED"}
+              className="hidden"
+            />
+          </div>
+
           {/* Chat Input */}
-          <div className="p-3 bg-white dark:bg-[#06261d] border-t border-slate-100 dark:border-primary-container/20 flex items-center gap-2 transition-colors duration-300">
+          <div className="p-3 bg-white dark:bg-[#06261d] flex items-center gap-2 transition-colors duration-300">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={sessionStatus === "CLOSED" || isLoading}
+              className="w-10 h-10 shrink-0 bg-slate-100 dark:bg-[#031d16] hover:bg-slate-200 dark:hover:bg-[#053c2f] text-slate-500 dark:text-emerald-100/75 flex items-center justify-center rounded-xl transition-all active:scale-[0.93] disabled:opacity-40 cursor-pointer border border-slate-200/20"
+              title="Đính kèm file (Tối đa 5MB)"
+            >
+              <Paperclip className="w-4 h-4" />
+            </button>
+
             <input
               type="text"
               value={input}
@@ -305,6 +467,7 @@ export default function ChatWidget() {
               placeholder={sessionStatus === "CLOSED" ? "Phiên hỗ trợ đã đóng" : "Nhập yêu cầu..."}
               className="flex-1 bg-slate-50 dark:bg-[#031d16] border border-slate-100 dark:border-primary-container/20 rounded-xl px-4 py-2.5 text-sm text-slate-800 dark:text-emerald-50 placeholder-slate-400 outline-none focus:border-[#003527] dark:focus:border-[#fe932c] transition-all disabled:opacity-55 disabled:cursor-not-allowed"
             />
+            
             <button
               type="button"
               onClick={sendMessage}

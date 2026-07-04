@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { fetchAuthSession } from "aws-amplify/auth";
 import type { Order } from "../../../types/cart";
 
 interface OrderDetailsModalProps {
@@ -8,7 +10,42 @@ interface OrderDetailsModalProps {
   onClose: () => void;
 }
 
+type StatusHistoryEntry = {
+  status: string;
+  changedBy: string;
+  reason?: string;
+  createdAt: string;
+};
+
 export function OrderDetailsModal({ isOpen, order, onClose }: OrderDetailsModalProps) {
+  const [history, setHistory] = useState<StatusHistoryEntry[]>([]);
+
+  useEffect(() => {
+    if (!isOpen || !order) {
+      setHistory([]);
+      return;
+    }
+
+    const fetchHistory = async () => {
+      try {
+        const session = await fetchAuthSession();
+        const token = session.tokens?.idToken?.toString();
+        if (!token) return;
+
+        const res = await fetch(`/api/orders/${order.id}/history`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          setHistory(await res.json());
+        }
+      } catch {
+        // Bỏ qua nếu không lấy được lịch sử (không chặn xem chi tiết đơn hàng)
+      }
+    };
+
+    fetchHistory();
+  }, [isOpen, order]);
+
   if (!isOpen || !order) return null;
 
   const formatPrice = (price: number) => price.toLocaleString("vi-VN") + " ₫";
@@ -98,6 +135,28 @@ export function OrderDetailsModal({ isOpen, order, onClose }: OrderDetailsModalP
             </div>
           </div>
 
+          {/* Status History Timeline */}
+          {history.length > 0 && (
+            <div className="mb-8">
+              <h4 className="text-sm font-bold text-[#002B1F] border-b border-gray-100 pb-2 mb-4">
+                Lịch Sử Trạng Thái
+              </h4>
+              <ul className="space-y-3">
+                {history.map((entry, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm">
+                    <span className="mt-1 w-2 h-2 rounded-full bg-[#A36B2B] shrink-0" />
+                    <div>
+                      <span className="font-semibold text-slate-800">{entry.status}</span>
+                      <span className="text-slate-500"> — {formatDate(entry.createdAt)}</span>
+                      <div className="text-xs text-slate-500">Bởi: {entry.changedBy}</div>
+                      {entry.reason && <div className="text-xs italic text-slate-500">&ldquo;{entry.reason}&rdquo;</div>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Product Items */}
           <div>
             <h4 className="text-sm font-bold text-[#002B1F] border-b border-gray-100 pb-2 mb-4">
@@ -138,6 +197,14 @@ export function OrderDetailsModal({ isOpen, order, onClose }: OrderDetailsModalP
                       </tr>
                     );
                   })}
+                  {!!order.discountAmount && (
+                    <tr className="border-b border-gray-100">
+                      <td colSpan={3} className="p-3 text-right text-emerald-600">
+                        Giảm giá {order.couponCode ? `(${order.couponCode})` : ""}:
+                      </td>
+                      <td className="p-3 text-right text-emerald-600">-{formatPrice(order.discountAmount)}</td>
+                    </tr>
+                  )}
                   <tr className="bg-[#002B1F]/[0.02] font-bold">
                     <td colSpan={3} className="p-4 text-right text-slate-700">TỔNG THANH TOÁN:</td>
                     <td className="p-4 text-right text-[#002B1F]">{formatPrice(order.totalPrice || 0)}</td>

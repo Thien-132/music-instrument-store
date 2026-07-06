@@ -76,7 +76,7 @@ segment cha áp dụng cho mọi segment con chưa có file riêng).
   (kiểm tra lại class grid thực tế trong `ProductGrid`/`page.tsx` khi implement
   để khớp số cột `sm:`/`md:`/`lg:`).
 - Mỗi thẻ skeleton: `animate-pulse` (Tailwind built-in), khối ảnh vuông
-  `aspect-square bg-border-subtle rounded-default`, 2 thanh giả cho tên/giá.
+  `aspect-square bg-border-subtle rounded-lg`, 2 thanh giả cho tên/giá.
 - Render ~8 thẻ skeleton (map từ mảng cố định).
 
 ### 5. `app/(storefront)/product/[id]/loading.tsx`

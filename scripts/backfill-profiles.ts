@@ -86,6 +86,8 @@ async function main() {
       }
 
       const now = new Date().toISOString();
+      const email = getAttr(user.Attributes, "email");
+      const name = getAttr(user.Attributes, "name") || email.split("@")[0] || "";
 
       try {
         await ddbDocClient.send(
@@ -95,8 +97,8 @@ async function main() {
               PK: `USER#${userId}`,
               SK: "PROFILE",
               userId,
-              email: getAttr(user.Attributes, "email"),
-              name: getAttr(user.Attributes, "name"),
+              email,
+              name,
               phone: getAttr(user.Attributes, "phone_number"),
               address: "",
               updatedAt: now,

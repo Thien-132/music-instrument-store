@@ -82,7 +82,7 @@ export class BackendStack extends cdk.Stack {
 
     // Product API Lambda
     const productApiLambda = new lambda.Function(this, "ProductApiFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/product-api"),
       environment: {
@@ -113,7 +113,7 @@ export class BackendStack extends cdk.Stack {
 
     // Order API Lambda (Đẩy đơn hàng vào SQS)
     const orderApiLambda = new lambda.Function(this, "OrderApiFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/order-api"),
       environment: {
@@ -126,7 +126,7 @@ export class BackendStack extends cdk.Stack {
 
     // Order Processing Lambda (Đọc SQS và lưu vào DynamoDB)
     const orderProcessingLambda = new lambda.Function(this, "OrderProcessingFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/order-processing"),
       environment: {
@@ -139,7 +139,7 @@ export class BackendStack extends cdk.Stack {
 
     // Checkout Service Lambda (Stripe integration)
     const checkoutApiLambda = new lambda.Function(this, "CheckoutApiFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/checkout-service"),
       environment: {
@@ -152,7 +152,7 @@ export class BackendStack extends cdk.Stack {
 
     // Chatbot AI Lambda (Amazon Lex integration)
     const chatbotApiLambda = new lambda.Function(this, "ChatbotApiFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "chatBotHandler.handler",
       code: lambda.Code.fromAsset("../services/chatbot-backend"),
       environment: {
@@ -165,7 +165,7 @@ export class BackendStack extends cdk.Stack {
 
     // Notification Service Lambda (Lắng nghe NotificationQueue hoặc gọi đồng bộ)
     const notificationApiLambda = new lambda.Function(this, "NotificationApiFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/notification"),
       environment: {
@@ -179,7 +179,7 @@ export class BackendStack extends cdk.Stack {
     // Campaign Sender Lambda (tiêu thụ CampaignQueue, dùng chung code với NotificationApiFunction
     // nhưng là Lambda riêng để tách biệt log/scaling với luồng giao dịch)
     const campaignSenderLambda = new lambda.Function(this, "CampaignSenderFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.campaignHandler",
       code: lambda.Code.fromAsset("../services/notification"),
       environment: {
@@ -192,7 +192,7 @@ export class BackendStack extends cdk.Stack {
 
     // Campaign API Lambda (Admin tạo/liệt kê chiến dịch)
     const campaignApiLambda = new lambda.Function(this, "CampaignApiFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/campaign-api"),
       environment: {
@@ -205,7 +205,7 @@ export class BackendStack extends cdk.Stack {
 
     // Campaign Fan-out Lambda (EventBridge trigger, chia batch khách hàng vào CampaignQueue)
     const campaignFanOutLambda = new lambda.Function(this, "CampaignFanOutFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/campaign-fanout"),
       environment: {
@@ -218,7 +218,7 @@ export class BackendStack extends cdk.Stack {
 
     // Contact API Lambda (form Liên Hệ công khai, gửi email qua SES)
     const contactApiLambda = new lambda.Function(this, "ContactApiFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/contact-api"),
       environment: {
@@ -231,7 +231,7 @@ export class BackendStack extends cdk.Stack {
 
     // Stripe Payment Webhook Lambda
     const paymentWebhookLambda = new lambda.Function(this, "PaymentWebhookFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset("../services/payment-webhook"),
       environment: {

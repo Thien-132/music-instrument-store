@@ -34,7 +34,7 @@ export class AuthStack extends cdk.Stack {
 
     // 1b. Cognito Lambda Trigger: tuỳ biến nội dung email OTP (đăng ký / quên mật khẩu)
     const customMessageFn = new lambda.Function(this, 'CustomMessageTriggerFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('../services/auth-triggers'),
       logRetention: logs.RetentionDays.ONE_WEEK,
@@ -43,7 +43,7 @@ export class AuthStack extends cdk.Stack {
 
     // 1c. Cognito Lambda Trigger: tự tạo bản ghi PROFILE trong DynamoDB ngay khi xác nhận đăng ký
     const postConfirmationFn = new lambda.Function(this, 'PostConfirmationTriggerFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('../services/auth-post-confirmation'),
       environment: {

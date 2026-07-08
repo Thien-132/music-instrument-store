@@ -71,7 +71,9 @@ describe("POST /auth/device/check", () => {
     });
     ddbMock.on(PutCommand).resolves({});
 
+    const before = Date.now();
     const result = await handler(buildEvent(), {} as Context, () => {});
+    const after = Date.now();
 
     expect(result!.statusCode).toBe(200);
     expect(JSON.parse(result!.body)).toEqual({ trusted: false });
@@ -82,6 +84,20 @@ describe("POST /auth/device/check", () => {
     const emailBody = JSON.parse(invokePayload.body);
     expect(emailBody.recipient).toBe("user1@example.com");
     expect(emailBody.message).toMatch(/\d{6}/);
+
+    const otpPut = ddbMock
+      .commandCalls(PutCommand)
+      .map((call) => call.args[0].input)
+      .find((input) => (input.Item as Record<string, unknown>)?.SK === "OTP");
+    expect(otpPut).toBeDefined();
+    const otpItem = otpPut!.Item as Record<string, unknown>;
+    expect(typeof otpItem.code).toBe("string");
+    expect(otpItem.code).toMatch(/^\d{6}$/);
+    expect(typeof otpItem.expiresAt).toBe("string");
+    // ttl must be a Unix-seconds timestamp (DynamoDB TTL requirement), roughly now + 10 minutes.
+    const expectedTtlSeconds = Math.floor((before + 10 * 60 * 1000) / 1000);
+    expect(otpItem.ttl).toBeGreaterThanOrEqual(expectedTtlSeconds - 1);
+    expect(otpItem.ttl).toBeLessThanOrEqual(Math.floor((after + 10 * 60 * 1000) / 1000) + 1);
   });
 
   it("treats a never-seen device as untrusted and sends an OTP email", async () => {
@@ -93,5 +109,33 @@ describe("POST /auth/device/check", () => {
     expect(result!.statusCode).toBe(200);
     expect(JSON.parse(result!.body)).toEqual({ trusted: false });
     expect(lambdaMock.commandCalls(InvokeCommand)).toHaveLength(1);
+  });
+
+  it("returns 400 when the device is untrusted but no email claim is present", async () => {
+    ddbMock.on(GetCommand).resolves({ Item: undefined });
+    ddbMock.on(PutCommand).resolves({});
+
+    const result = await handler(
+      buildEvent({
+        requestContext: { authorizer: { claims: { sub: "user-1" } } } as any,
+      }),
+      {} as Context,
+      () => {}
+    );
+
+    expect(result!.statusCode).toBe(400);
+    expect(lambdaMock.commandCalls(InvokeCommand)).toHaveLength(0);
+  });
+
+  it("returns 500 when the notification Lambda fails to send the OTP email", async () => {
+    ddbMock.on(GetCommand).resolves({ Item: undefined });
+    ddbMock.on(PutCommand).resolves({});
+    lambdaMock.on(InvokeCommand).resolves({ StatusCode: 200, FunctionError: "Unhandled" });
+
+    const result = await handler(buildEvent(), {} as Context, () => {});
+
+    expect(result!.statusCode).toBe(500);
+    const body = JSON.parse(result!.body);
+    expect(body.message).not.toMatch(/\d{6}/);
   });
 });

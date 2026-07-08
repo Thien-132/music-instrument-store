@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Product } from "../../../types/product";
 import { ImagePicker } from "../common/ImagePicker";
+import { useToast } from "../../context/ToastContext";
 
 interface ProductFormData {
   id: string;
@@ -39,6 +40,7 @@ export function ProductModal({
   onClose,
   authToken,
 }: ProductModalProps) {
+  const { showToast } = useToast();
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
@@ -163,7 +165,7 @@ export function ProductModal({
               uploadUrlEndpoint={`/api/products/${formData.id}/image-upload-url`}
               authToken={authToken}
               onUploaded={(publicUrl) => onChangeField("imageUrl", publicUrl)}
-              onError={(message) => console.error("Product image upload error:", message)}
+              onError={(message) => showToast(message, "error")}
               disabled={isSubmitting}
             />
           </div>

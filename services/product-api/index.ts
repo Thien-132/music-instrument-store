@@ -983,6 +983,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           phone: body.phone ?? existing.phone ?? "",
           address: body.address ?? existing.address ?? "",
           avatarUrl: body.avatarUrl ?? existing.avatarUrl ?? "",
+          // Chỉ giữ lại role hiện có, KHÔNG đọc từ body — route tự-phục-vụ này không được phép
+          // để user tự đổi role của chính mình (chỉ route admin PUT /users/{userId} mới được).
+          ...(existing.role ? { role: existing.role } : {}),
           updatedAt: now,
         };
 

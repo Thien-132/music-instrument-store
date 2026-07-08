@@ -84,6 +84,60 @@ describe("PUT /users/profile", () => {
     expect(profile.avatarUrl).toBe("https://bucket.s3.amazonaws.com/users/user-1/profile/existing.jpg");
   });
 
+  it("preserves the existing role and ignores any role sent in the body", async () => {
+    ddbMock.on(GetCommand).resolves({
+      Item: {
+        PK: "USER#user-1",
+        SK: "PROFILE",
+        userId: "user-1",
+        email: "user1@example.com",
+        name: "Nguyen Van A",
+        phone: "",
+        address: "",
+        role: "Admin",
+      },
+    });
+    ddbMock.on(PutCommand).resolves({});
+
+    const result = await handler(
+      buildEvent({ body: JSON.stringify({ name: "Updated Name", role: "Admin" }) }),
+      {} as Context,
+      () => {}
+    );
+
+    expect(result!.statusCode).toBe(200);
+    const { profile } = JSON.parse(result!.body);
+    expect(profile.role).toBe("Admin");
+
+    const putCall = ddbMock.commandCalls(PutCommand)[0];
+    expect(putCall.args[0].input.Item?.role).toBe("Admin");
+  });
+
+  it("does not let a self-service update grant a role that didn't already exist", async () => {
+    ddbMock.on(GetCommand).resolves({
+      Item: {
+        PK: "USER#user-1",
+        SK: "PROFILE",
+        userId: "user-1",
+        email: "user1@example.com",
+        name: "Nguyen Van A",
+        phone: "",
+        address: "",
+      },
+    });
+    ddbMock.on(PutCommand).resolves({});
+
+    const result = await handler(
+      buildEvent({ body: JSON.stringify({ name: "Updated Name", role: "Admin" }) }),
+      {} as Context,
+      () => {}
+    );
+
+    expect(result!.statusCode).toBe(200);
+    const { profile } = JSON.parse(result!.body);
+    expect(profile.role).toBeUndefined();
+  });
+
   it("GET returns avatarUrl: \"\" in the default profile when none exists yet", async () => {
     ddbMock.on(GetCommand).resolves({ Item: undefined });
 

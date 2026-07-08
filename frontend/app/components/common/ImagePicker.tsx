@@ -29,6 +29,16 @@ export function ImagePicker({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(currentImageUrl);
+  const [syncedImageUrl, setSyncedImageUrl] = useState(currentImageUrl);
+
+  // currentImageUrl thường rỗng ở lần render đầu (parent chưa fetch xong profile/product) rồi
+  // mới có giá trị thật sau đó — đồng bộ lại preview khi giá trị đó tới, tránh kẹt ở placeholder.
+  // Cập nhật state ngay trong lúc render (theo khuyến nghị của React) thay vì dùng useEffect,
+  // để tránh render thừa và cascading renders.
+  if (currentImageUrl !== syncedImageUrl) {
+    setSyncedImageUrl(currentImageUrl);
+    setPreviewUrl(currentImageUrl);
+  }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

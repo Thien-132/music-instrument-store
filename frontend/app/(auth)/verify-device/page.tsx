@@ -8,6 +8,15 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { useToast } from "../../context/ToastContext";
 import { getOrCreateDeviceId } from "../../lib/deviceId";
 
+// Chỉ chấp nhận đường dẫn nội bộ dạng "/xxx" (một dấu / duy nhất ở đầu, không phải "//" hay
+// "https://..."), để tránh open-redirect qua query param "redirect" mà kẻ tấn công tự chèn vào link.
+function getSafeRedirectTarget(value: string | null): string {
+  if (value && /^\/(?!\/)[^\s\\]*$/.test(value)) {
+    return value;
+  }
+  return "/";
+}
+
 function VerifyDeviceContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -15,7 +24,7 @@ function VerifyDeviceContent() {
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const redirectTarget = searchParams.get("redirect") || "/";
+  const redirectTarget = getSafeRedirectTarget(searchParams.get("redirect"));
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();

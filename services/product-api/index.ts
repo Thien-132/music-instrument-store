@@ -433,6 +433,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       const code = generateOtpCode();
       const expiresAt = new Date(now + OTP_TTL_MS).toISOString();
 
+      // Cố ý: khoá theo user (không theo deviceId) -> mỗi user chỉ có 1 OTP đang chờ tại 1 thời
+      // điểm. Nếu 2 thiết bị lạ cùng kích hoạt gần nhau, mã của thiết bị trước sẽ bị ghi đè.
       await dynamoDb.send(
         new PutCommand({
           TableName: tableName,

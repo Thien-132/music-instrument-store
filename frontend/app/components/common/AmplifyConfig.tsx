@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Amplify } from "aws-amplify";
+import { initAuthStorageFromPreference } from "../../lib/authStorage";
 
 
 if (!process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID || !process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID) {
@@ -19,6 +20,8 @@ Amplify.configure({
     },
   },
 });
+
+initAuthStorageFromPreference();
 
 export default function AmplifyConfig({
   children,

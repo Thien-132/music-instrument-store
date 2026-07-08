@@ -9,6 +9,7 @@ import { signIn, fetchAuthSession, signInWithRedirect } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "../../context/ToastContext";
 import { Eye, EyeOff, Lock, ArrowRight, Music, Sun, Moon } from "lucide-react";
+import { applyRememberMePreference } from "../../lib/authStorage";
 
 // Fallback configuration if not initialized in the module scope
 if (!Amplify.getConfig().Auth?.Cognito) {
@@ -68,6 +69,7 @@ export default function Login() {
     }
     setIsSubmitting(true);
     try {
+      applyRememberMePreference(rememberMe);
       await signIn({
         username: email,
         password: password,

@@ -407,7 +407,27 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const authorizer = event.requestContext.authorizer;
     const userId = authorizer?.claims?.sub;
     const email = authorizer?.claims?.email;
-    const userName = authorizer?.claims?.name || email || authorizer?.claims?.["cognito:username"] || "User";
+    let userName = authorizer?.claims?.name || email || authorizer?.claims?.["cognito:username"] || "User";
+
+    // Proactively fetch the user's real name from their profile if available
+    if (userId) {
+      try {
+        const userProfile = await dynamoDb.send(
+          new GetCommand({
+            TableName: tableName,
+            Key: {
+              PK: `USER#${userId}`,
+              SK: "PROFILE",
+            },
+          })
+        );
+        if (userProfile.Item?.name) {
+          userName = userProfile.Item.name;
+        }
+      } catch (err) {
+        console.warn("Could not fetch user profile name:", err);
+      }
+    }
 
     // -------------------------------------------------------------
     // Route: /auth/device/check (kiểm tra thiết bị đã tin cậy hay chưa, gửi OTP nếu chưa)

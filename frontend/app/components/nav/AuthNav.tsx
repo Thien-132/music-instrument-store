@@ -53,6 +53,27 @@ export default function AuthNav() {
           console.warn("Could not fetch user attributes:", attrError);
         }
  
+        let profileName: string | undefined;
+        try {
+          const session = await fetchAuthSession();
+          const token = session.tokens?.idToken?.toString();
+          if (token) {
+            const profileRes = await fetch("/api/users/profile", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            if (profileRes.ok) {
+              const { profile } = await profileRes.json();
+              if (profile?.name) {
+                profileName = profile.name;
+              }
+            }
+          }
+        } catch (profileError) {
+          console.warn("Could not fetch user profile for nav:", profileError);
+        }
+
         try {
           const session = await fetchAuthSession();
           const groups = session.tokens?.idToken?.payload["cognito:groups"] as string[] | undefined;
@@ -66,7 +87,7 @@ export default function AuthNav() {
           username: currentUser.username,
           userId: currentUser.userId,
           email,
-          name,
+          name: profileName || name,
         });
       } catch {
         setUser(null);

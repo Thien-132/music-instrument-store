@@ -65,9 +65,27 @@ export default function ChatWidget() {
         if (token) {
           const { fetchUserAttributes } = await import("aws-amplify/auth");
           const attrs = await fetchUserAttributes();
+          
+          let profileName = attrs.name || attrs.given_name || attrs.family_name || attrs.email;
+          try {
+            const profileRes = await fetch("/api/users/profile", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            if (profileRes.ok) {
+              const { profile } = await profileRes.json();
+              if (profile?.name) {
+                profileName = profile.name;
+              }
+            }
+          } catch (profileError) {
+            console.warn("Could not fetch user profile for chat widget:", profileError);
+          }
+
           setUserProfile({
             email: attrs.email,
-            name: attrs.name || attrs.given_name || attrs.family_name || attrs.email,
+            name: profileName,
           });
         }
       } catch (err) {

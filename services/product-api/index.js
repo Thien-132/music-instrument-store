@@ -181,7 +181,7 @@ var applyOrderStatusUpdate = async (targetOrderId, order, status, reason, change
     status,
     updatedAt: now
   };
-  const isActivating = (order.status === "PENDING" || order.status === "Ch\u1ED3 x\xE1c nh\u1EADn") && (status === "Ch\u1ED3 l\u1EA5y \u0111\u01A1n" || status === "\u0110ang giao h\xE0ng");
+  const isActivating = (order.status === "PENDING" || order.status === "Ch\u1EDD x\xE1c nh\u1EADn") && (status === "Ch\u1EDD l\u1EA5y \u0111\u01A1n" || status === "\u0110ang giao h\xE0ng");
   const isOnlinePayment = order.paymentMethod === "VNPay" || order.paymentMethod === "Momo" || order.paymentMethod === "Stripe";
   if (isActivating && isOnlinePayment && Array.isArray(order.items)) {
     for (const item of order.items) {
@@ -319,7 +319,25 @@ var handler = async (event) => {
     const authorizer = event.requestContext.authorizer;
     const userId = authorizer?.claims?.sub;
     const email = authorizer?.claims?.email;
-    const userName = authorizer?.claims?.name || email || authorizer?.claims?.["cognito:username"] || "User";
+    let userName = authorizer?.claims?.name || email || authorizer?.claims?.["cognito:username"] || "User";
+    if (userId) {
+      try {
+        const userProfile = await dynamoDb.send(
+          new import_lib_dynamodb.GetCommand({
+            TableName: tableName,
+            Key: {
+              PK: `USER#${userId}`,
+              SK: "PROFILE"
+            }
+          })
+        );
+        if (userProfile.Item?.name) {
+          userName = userProfile.Item.name;
+        }
+      } catch (err) {
+        console.warn("Could not fetch user profile name:", err);
+      }
+    }
     if (resource === "/auth/device/check" && method === "POST") {
       if (!userId) {
         return jsonResponse(401, { message: "Unauthorized: Ch\u01B0a \u0111\u0103ng nh\u1EADp" });
